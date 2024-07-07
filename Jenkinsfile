@@ -1,57 +1,49 @@
-
 pipeline {
     agent any
 
-    tools {
-        jdk 'Java_JDK'
-        maven 'Maven'
+    environment {
+        JAVA_HOME = tool name: 'Java_JDK', type: 'jdk'
+        MAVEN_HOME = tool name: 'Maven', type: 'maven'
+        PATH = "${JAVA_HOME}/bin:${MAVEN_HOME}/bin:${env.PATH}"
     }
 
     stages {
         stage('Checkout') {
             steps {
-                git branch: 'master', url: 'https://github.com/martinchichi/bettercollective-challenge.git'
+                git branch: 'main', url: 'https://github.com/martinchichi/bettercollective-challenge.git'
             }
         }
 
         stage('Build') {
             steps {
-                bat 'mvn clean compile'
+                sh 'mvn clean compile'
             }
         }
 
         stage('Test') {
-            parallel {
-                stage('Test in Chrome') {
-                    steps {
-                        script {
-                            bat 'mvn test -Dbrowser=chrome'
-                        }
-                    }
-                }
-                stage('Test in Firefox') {
-                    steps {
-                        script {
-                            bat 'mvn test -Dbrowser=firefox'
-                        }
-                    }
-                }
-
-            }
-        }
-
-        stage('Report') {
             steps {
-                cucumber buildStatus: 'NULL',
-                         fileIncludePattern: '**/cucumber*.json',
-                         jsonReportDirectory: 'target'
+                sh 'mvn test'
             }
         }
+
+        stage('Package') {
+            steps {
+                sh 'mvn package'
+            }
+        }
+
+        stage('Archive Artifacts') {
+            steps {
+                archiveArtifacts artifacts: '**/target/*.jar', fingerprint: true
+            }
+        }
+
     }
 
     post {
         always {
-            archiveArtifacts 'target/**/*'
+            junit '**/target/surefire-reports/*.xml'
+            cleanWs()
         }
     }
 }
