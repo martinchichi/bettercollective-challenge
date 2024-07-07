@@ -2,9 +2,7 @@ pipeline {
     agent any
 
     environment {
-        JAVA_HOME = tool name: 'Java_JDK', type: 'jdk'
-        MAVEN_HOME = tool name: 'Maven', type: 'maven'
-        PATH = "${env.JAVA_HOME}/bin:${env.MAVEN_HOME}/bin:${env.PATH}"
+        PATH = "${tool 'Java_JDK'}/bin:${tool 'Maven'}/bin:${env.PATH}"
     }
 
     stages {
@@ -16,19 +14,19 @@ pipeline {
 
         stage('Build') {
             steps {
-                bat "${MAVEN_HOME}/bin/mvn clean compile"
+                sh 'mvn clean compile'
             }
         }
 
         stage('Test') {
             steps {
-                bat "${MAVEN_HOME}/bin/mvn test"
+                sh 'mvn test'
             }
         }
 
         stage('Package') {
             steps {
-                bat "${MAVEN_HOME}/bin/mvn package"
+                sh 'mvn package'
             }
         }
 
