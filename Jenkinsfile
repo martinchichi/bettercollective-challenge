@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        PATH = "${tool 'Java_JDK'}/bin:${tool 'Maven'}/bin:${env.PATH}"
+        PATH = "${tool 'Java_JDK'}/bin;${tool 'Maven'}/bin;${env.PATH}"
     }
 
     stages {
@@ -14,19 +14,19 @@ pipeline {
 
         stage('Build') {
             steps {
-                sh 'mvn clean compile'
+                bat 'mvn clean compile'
             }
         }
 
         stage('Test') {
             steps {
-                sh 'mvn test'
+                bat 'mvn test'
             }
         }
 
         stage('Package') {
             steps {
-                sh 'mvn package'
+                bat 'mvn package'
             }
         }
 
