@@ -4,7 +4,7 @@ pipeline {
     environment {
         JAVA_HOME = tool name: 'Java_JDK', type: 'jdk'
         MAVEN_HOME = tool name: 'Maven', type: 'maven'
-        PATH = "${JAVA_HOME}/bin:${MAVEN_HOME}/bin:${env.PATH}"
+        PATH = "${env.JAVA_HOME}/bin:${env.MAVEN_HOME}/bin:${env.PATH}"
     }
 
     stages {
@@ -16,19 +16,19 @@ pipeline {
 
         stage('Build') {
             steps {
-                bat 'mvn clean compile'
+                bat "${MAVEN_HOME}/bin/mvn clean compile"
             }
         }
 
         stage('Test') {
             steps {
-                bat 'mvn test'
+                bat "${MAVEN_HOME}/bin/mvn test"
             }
         }
 
         stage('Package') {
             steps {
-                bat 'mvn package'
+                bat "${MAVEN_HOME}/bin/mvn package"
             }
         }
 
@@ -37,7 +37,6 @@ pipeline {
                 archiveArtifacts artifacts: '**/target/*.jar', fingerprint: true
             }
         }
-
     }
 
     post {
